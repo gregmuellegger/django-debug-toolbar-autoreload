@@ -1,16 +1,34 @@
 {% load i18n %}
 <script type="text/javascript">//<![CDATA[
 (function ($) {
-    var watch_resources = [{% for template in templates %}
+    var template_resources = [{% for template in templates %}
         "{{ template|escapejs }}"{% if not forloop.last %},{% endif %}
     {% endfor %}];
+    var media_resources = [];
+
+    var findMediaResources = function () {
+        var resources = media_resources + [];
+        /* Find linked CSS files */
+        $('link[rel=stylesheet]').each(function () {
+            var url = $(this).attr('href');
+            if (!url.match(/^data:/)) {
+                resources.push($(this).attr('href'));
+            }
+        });
+        return resources;
+    };
+
     var initial_url = window.location.href;
     var reload = function () {
         window.location.href = initial_url;
     };
     var listenForChanges = function () {
-        var data = $.map(watch_resources, function (resource) {
-            return 'r=' + encodeURIComponent(resource);
+        var data = [];
+        $.each(template_resources, function (i, resource) {
+            data.push('template=' + encodeURIComponent(resource));
+        });
+        $.each(findMediaResources(), function (i, resource) {
+            data.push('media=' + encodeURIComponent(resource));
         });
         data = data.join('&');
         $.ajax({

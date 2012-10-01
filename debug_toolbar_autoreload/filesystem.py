@@ -1,8 +1,12 @@
 import os
+import posixpath
 import sys
+from django.conf import settings
+from django.contrib.staticfiles import finders
 
 
 _win = (sys.platform == "win32")
+
 
 def get_mtimes(filenames):
     global _win
@@ -36,6 +40,19 @@ def get_source_files():
         filename
         for filename in map(module_to_filename, sys.modules.values())
         if filename]
+
+
+def resolve_media_url(url):
+    if settings.MEDIA_URL and url.startswith(settings.MEDIA_URL):
+        filename = url[len(settings.MEDIA_URL):]
+        filename = posixpath.normpath(filename).lstrip('/')
+        filename = os.path.join(settings.MEDIA_ROOT, filename)
+        return filename
+    if settings.STATIC_URL and url.startswith(settings.STATIC_URL):
+        filename = url[len(settings.STATIC_URL):]
+        filename = posixpath.normpath(filename).lstrip('/')
+        filename = finders.find(filename)
+        return filename
 
 
 class FileWatcher(object):

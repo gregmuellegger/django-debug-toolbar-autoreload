@@ -1,0 +1,6 @@
+.paragraph {
+    font-family: Arial;
+}
+.paragraph.second {
+    color: #f00;
+}

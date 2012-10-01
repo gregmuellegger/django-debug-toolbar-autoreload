@@ -1,15 +1,17 @@
 import os
 import time
 from django.http import HttpResponse
-from .filesystem import FileWatcher, SourceWatcher
+from .filesystem import resolve_media_url, FileWatcher, SourceWatcher
 
 
 def notify(request):
-    resources = request.GET.getlist('r')
+    resources = request.REQUEST.getlist('template')
+    media_resources = request.REQUEST.getlist('media')
+    media_resources = map(resolve_media_url, media_resources)
     resources = set(
         resource
-        for resource in resources
-        if os.path.exists(resource))
+        for resource in resources + media_resources
+        if resource and os.path.exists(resource))
 
     file_watcher = FileWatcher(resources)
     source_watcher = SourceWatcher()
