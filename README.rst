@@ -44,3 +44,20 @@ This means your settings file should look something like::
 
 **Requirements:** Django 1.4 or higher is required since we need a
 multithreaded development server.
+
+Contribute
+----------
+
+1. Download and setup the project::
+
+    git clone https://github.com/gregmuellegger/django-debug-toolbar-autoreload.git
+    cd django-debug-toolbar-autoreload
+    virtualenv .
+    source bin/activate
+    pip install -r requirements/development.txt
+    python manage.py syncdb
+    python manage.py runserver
+
+2. Open one of the demo pages from http://localhost:8000/ in your browser.
+3. Hack
+4. Send a pull request
