@@ -7,7 +7,7 @@
     var media_resources = [];
 
     var findMediaResources = function () {
-        var resources = media_resources + [];
+        var resources = [].concat(media_resources);
         /* Find linked CSS files */
         $('link[rel=stylesheet]').each(function () {
             var url = $(this).attr('href');
@@ -32,8 +32,8 @@
         });
         data = data.join('&');
         $.ajax({
-            url: '/__debug__/autoreload/',
-            type: 'GET',
+            url: "{{ AUTORELOAD_URL|escapejs }}",
+            type: 'POST',
             data: data,
             success: function (data, textStatus, jqXHR) {
                 switch (jqXHR.status) {

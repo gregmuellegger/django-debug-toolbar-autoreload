@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test.signals import template_rendered
 from django.utils.translation import ugettext_lazy as _
 from debug_toolbar.panels import DebugPanel
@@ -45,7 +46,12 @@ class AutoreloadPanel(DebugPanel):
             self.request.urlconf.urlpatterns
         )
 
+        # circumvent csrf check for the autoreload watcher view
+        if self.request.path == urls.AUTORELOAD_URL:
+            self.request.csrf_processing_done = True
+
     def process_response(self, request, response):
         self.record_stats({
             'templates': self.templates,
+            'AUTORELOAD_URL': urls.AUTORELOAD_URL,
         })
