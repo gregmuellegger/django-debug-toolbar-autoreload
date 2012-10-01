@@ -110,6 +110,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'debug_toolbar',
+    'debug_toolbar_autoreload',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -153,4 +154,5 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.cache.CacheDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar_autoreload.AutoreloadPanel',
 )

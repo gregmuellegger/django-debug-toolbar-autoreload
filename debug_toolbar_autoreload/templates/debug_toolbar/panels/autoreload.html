@@ -1,0 +1,56 @@
+{% load i18n %}
+<script type="text/javascript">//<![CDATA[
+(function ($) {
+    var watch_resources = [{% for template in templates %}
+        "{{ template|escapejs }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}];
+    var initial_url = window.location.href;
+    var reload = function () {
+        window.location.href = initial_url;
+    };
+    var listenForChanges = function () {
+        var data = $.map(watch_resources, function (resource) {
+            return 'r=' + encodeURIComponent(resource);
+        });
+        data = data.join('&');
+        $.ajax({
+            url: '/__debug__/autoreload/',
+            type: 'GET',
+            data: data,
+            success: function (data, textStatus, jqXHR) {
+                switch (jqXHR.status) {
+                    case 200:
+                        reload();
+                        break;
+                    case 0:
+                    case 204:
+                        setTimeout(listenForChanges, 500);
+                        break;
+                    default:
+                        console.log('unhandled status code', jqXHR.status);
+                        break;
+                }
+            },
+            error: function () {
+                console.log('ERROR', arguments);
+                setTimeout(listenForChanges, 3000);
+            }
+        });
+    };
+
+    $(document).ready(function () {
+        $('.djdt-reload').click(reload);
+        listenForChanges();
+    });
+})(djdt.jQuery);
+//]]></script>
+
+<p>Auto-reloading is activated.</p>
+<button class="djdt-reload">Reload page</button>
+
+<h2>Monitoring:</h2>
+<ul>
+{% for template in templates %}
+    <li><code>{{ template }}</code></li>
+{% endfor %}
+</ul>
