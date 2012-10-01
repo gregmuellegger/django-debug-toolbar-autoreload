@@ -1,0 +1,46 @@
+django-debug-toolbar-autoreload
+===============================
+
+This package contains an extra panel for the excellent django-debug-toolbar_.
+
+The purpose is to automatically reload the page if a template that was used to
+render the current page is changed. It is for your browser what the
+``runserver``'s auto-reload feature is for your python code.
+
+.. _django-debug-toolbar: http://pypi.python.org/pypi/django-debug-toolbar
+
+Install
+-------
+
+1. Put the ``debug_toolbar_autoreload`` source folder in your ``PYTHONPATH``.
+2. Add ``'debug_toolbar_autoreload'`` to your ``INSTALLED_APPS`` settings.
+3. Add ``'debug_toolbar_autoreload.AutoreloadPanel'`` to your ``DEBUG_TOOLBAR_PANELS``.
+
+This means your settings file should look something like::
+
+    INSTALLED_APPS = (
+        # ... other apps ...
+        'debug_toolbar',
+        'debug_toolbar_autoreload',
+    )
+
+    DEBUG_TOOLBAR_PANELS = (
+        # default panels
+        'debug_toolbar.panels.version.VersionDebugPanel',
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+        'debug_toolbar.panels.headers.HeaderDebugPanel',
+        'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
+        'debug_toolbar.panels.cache.CacheDebugPanel',
+        'debug_toolbar.panels.signals.SignalDebugPanel',
+        'debug_toolbar.panels.logger.LoggingPanel',
+
+        # autoreload panel
+        'debug_toolbar_autoreload.AutoreloadPanel',
+    )
+
+**Requirements:** Django 1.4 or higher is required since we need a
+multithreaded development server.
