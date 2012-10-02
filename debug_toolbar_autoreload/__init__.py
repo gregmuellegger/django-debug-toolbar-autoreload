@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.test.signals import template_rendered
 from django.utils.translation import ugettext_lazy as _
 from debug_toolbar.panels import DebugPanel
@@ -9,7 +8,7 @@ class AutoreloadPanel(DebugPanel):
     """
     Panel that reloads the page if a templatefile was changed.
     """
-    name = 'Version'
+    name = 'Autoreload'
     template = 'debug_toolbar/panels/autoreload.html'
     has_content = True
 
