@@ -6,20 +6,52 @@
     {% endfor %}];
     var media_resources = [];
 
+    var updateMonitorListing = function () {
+        var typed_resources = [];
+        $.each(template_resources, function (i, src) {
+            typed_resources.push({
+                type: 'template',
+                src: src
+            });
+        });
+
+        var table = $('#djDebugAutoreloadPanel table.monitor tbody');
+
+        var addResource = function (i, resource) {
+            var monitor = true;
+            var row = $(
+                '<tr class="djDebug' + ((i+1) % 2 == 0 ? 'Even' : 'Odd') + '">' +
+                    '<td><input type="checkbox" ' + (monitor ? 'checked ' : '') + 'disabled /></td>' +
+                    '<td>' + resource.type + '</td>' +
+                    '<td><code>' + resource.src + '</code></td>' +
+                '</tr>');
+            table.append(row);
+        };
+
+        $.each(typed_resources, addResource);
+        $.each(findMediaResources(), addResource);
+    };
+
     var findMediaResources = function () {
         var resources = [].concat(media_resources);
         /* Find CSS files */
         $('link[rel=stylesheet]').each(function () {
             var url = $(this).attr('href');
             if (!url.match(/^data:/)) {
-                resources.push($(this).attr('href'));
+                resources.push({
+                    type: 'css',
+                    src: $(this).attr('href')
+                });
             }
         });
         /* Find JS files */
         $('script[src]').each(function () {
             var url = $(this).attr('src');
             if (!url.match(/^data:/)) {
-                resources.push($(this).attr('src'));
+                resources.push({
+                    type: 'js',
+                    src: $(this).attr('src')
+                });
             }
         });
         return resources;
@@ -34,7 +66,7 @@
             data.push('template=' + encodeURIComponent(resource));
         });
         $.each(findMediaResources(), function (i, resource) {
-            data.push('media=' + encodeURIComponent(resource));
+            data.push('media=' + encodeURIComponent(resource.src));
         });
         data = data.join('&');
         $.ajax({
@@ -65,6 +97,7 @@
     $(document).ready(function () {
         $('.djdt-reload').click(reload);
         listenForChanges();
+        updateMonitorListing(template_resources);
     });
 })(djdt.jQuery);
 //]]></script>
@@ -73,8 +106,13 @@
 <button class="djdt-reload">Reload page</button>
 
 <h2>Monitoring:</h2>
-<ul>
-{% for template in templates %}
-    <li><code>{{ template }}</code></li>
-{% endfor %}
-</ul>
+<table class="monitor">
+    <thead>
+        <th>Monitor</th>
+        <th>Type</th>
+        <th>Filename</th>
+    </thead>
+    <tbody>
+    
+    </tbody>
+</table>
