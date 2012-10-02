@@ -8,11 +8,18 @@
 
     var findMediaResources = function () {
         var resources = [].concat(media_resources);
-        /* Find linked CSS files */
+        /* Find CSS files */
         $('link[rel=stylesheet]').each(function () {
             var url = $(this).attr('href');
             if (!url.match(/^data:/)) {
                 resources.push($(this).attr('href'));
+            }
+        });
+        /* Find JS files */
+        $('script[src]').each(function () {
+            var url = $(this).attr('src');
+            if (!url.match(/^data:/)) {
+                resources.push($(this).attr('src'));
             }
         });
         return resources;

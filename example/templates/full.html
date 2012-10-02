@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/base.css" />
+</head>
+<body>
+    <h1>Full example</h1>
+    <p>Change one of the following files and see the magic happen:</p>
+    <ul>
+        <li><code>example/static/css/base.css</code></li>
+        <li><code>example/static/js/init.js</code></li>
+        <li><code>example/templates/full.html</code></li>
+        <li><code>example/templates/include.html</code></li>
+    </ul>
+
+    <p class="paragraph">
+    Lorem ipsum dolor sit amet, consectetuer sadipscing elitr, sed diam nonumy
+    eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
+    kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
+    ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+    At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd
+    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
+    ipsum dolor sit amet, <em>consetetur sadipscing elitr, sed diam nonumy eirmod
+    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</em>
+    At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd
+    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+    Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie
+    consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et
+    accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit
+    augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet,
+    consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut
+    laoreet dolore magna aliquam erat volutpat.
+    </p>
+    <p class="paragraph second">
+    Ut wisi enim ad minim veniam, <strong>quis nostrud exerci tation
+    ullamcorper suscipit</strong> lobortis nisl ut aliquip ex ea commodo
+    consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit
+    esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at
+    vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum
+    zzril delenit augue duis dolore te feugait nulla
+    facilisi.
+    </p>
+
+    {% include "include.html" %}
+
+    <p>Last full reload: {% now "c" %}</p>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/init.js"></script>
+</body>
+</html>
