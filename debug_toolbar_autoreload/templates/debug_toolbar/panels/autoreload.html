@@ -4,20 +4,10 @@
     var template_resources = [{% for template in templates %}
         "{{ template|escapejs }}"{% if not forloop.last %},{% endif %}
     {% endfor %}];
-    var media_resources = [];
 
-    var updateMonitorListing = function () {
-        var typed_resources = [];
-        $.each(template_resources, function (i, src) {
-            typed_resources.push({
-                type: 'template',
-                src: src
-            });
-        });
-
-        var table = $('#djDebugAutoreloadPanel table.monitor tbody');
-
-        var addResource = function (i, resource) {
+    var showMonitoringList = function (resources) {
+        var table = $('#djDebugAutoreloadPanel table.djDebugAutoreload-monitor tbody');
+        $.each(resources, function (i, resource) {
             var monitor = true;
             var row = $(
                 '<tr class="djDebug' + ((i+1) % 2 == 0 ? 'Even' : 'Odd') + '">' +
@@ -26,14 +16,18 @@
                     '<td><code>' + resource.src + '</code></td>' +
                 '</tr>');
             table.append(row);
-        };
-
-        $.each(typed_resources, addResource);
-        $.each(findMediaResources(), addResource);
+        });
     };
 
-    var findMediaResources = function () {
-        var resources = [].concat(media_resources);
+    var findResources = function () {
+        var resources = [];
+        /* Templates */
+        $.each(template_resources, function (i, filename) {
+            resources.push({
+                type: 'template',
+                src: filename
+            });
+        });
         /* Find CSS files */
         $('link[rel=stylesheet]').each(function () {
             var url = $(this).attr('href');
@@ -60,13 +54,13 @@
     var reload = function () {
         window.location.reload(true);
     };
+
     var listenForChanges = function () {
+        var resources = findResources();
         var data = [];
-        $.each(template_resources, function (i, resource) {
-            data.push('template=' + encodeURIComponent(resource));
-        });
-        $.each(findMediaResources(), function (i, resource) {
-            data.push('media=' + encodeURIComponent(resource.src));
+        $.each(resources, function (i, resource) {
+            var query_type = (resource.type == 'template' ? 'template' : 'media');
+            data.push(query_type + '=' + encodeURIComponent(resource.src));
         });
         data = data.join('&');
         $.ajax({
@@ -92,21 +86,30 @@
                 setTimeout(listenForChanges, 3000);
             }
         });
+
+        showMonitoringList(resources);
     };
 
     $(document).ready(function () {
-        $('.djdt-reload').click(reload);
+        $('.djDebugAutoreload-reload').click(reload);
         listenForChanges();
-        updateMonitorListing(template_resources);
     });
 })(djdt.jQuery);
 //]]></script>
+<style type="text/css">
+    .djDebugAutoreload-reload {
+        float: right;
+    }
+    .djDebugAutoreload-monitor {
+        clear: both;
+    }
+</style>
 
+<button class="djDebugAutoreload-reload">Reload page</button>
 <p>Auto-reloading is activated.</p>
-<button class="djdt-reload">Reload page</button>
 
 <h2>Monitoring:</h2>
-<table class="monitor">
+<table class="djDebugAutoreload-monitor">
     <thead>
         <th>Monitor</th>
         <th>Type</th>
