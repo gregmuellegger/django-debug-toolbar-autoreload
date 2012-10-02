@@ -25,9 +25,8 @@
         return resources;
     };
 
-    var initial_url = window.location.href;
     var reload = function () {
-        window.location.href = initial_url;
+        window.location.reload(true);
     };
     var listenForChanges = function () {
         var data = [];
