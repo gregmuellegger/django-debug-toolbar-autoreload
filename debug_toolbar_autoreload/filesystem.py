@@ -69,12 +69,12 @@ class SourceWatcher(FileWatcher):
         return filename
 
     def get_source_files(self):
-        return [
-            filename
-            for filename in map(
-                self._module_to_filename,
-                sys.modules.values())
-            if filename]
+        source_files = []
+        for module in sys.modules.values():
+            filename = self._module_to_filename(module)
+            if filename:
+                source_files.append(filename)
+        return source_files
 
     @property
     def resources(self):
