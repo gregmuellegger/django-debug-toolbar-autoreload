@@ -5,6 +5,26 @@ from .filesystem import Resource, MediaResource
 
 
 def notify(request):
+    '''
+    This view gets a POST request from the Javascript part of the
+    AutoreloadPanel that contains a body that looks like::
+
+        template=/full/path/to/template.html&template=/another/template.eml:123456789&
+        media=/static/url/to/a/file:133456780&media=http://media.localhost.local/base.css
+
+    It is a list of template paths and a list of URLs that are part of the
+    static/media directories of the project. The filename might be followed by
+    a unix-epoch timestamp of the last modified date, seperated by a colon.
+
+    The view then blocks the response as long until one of the specified files
+    has a modified-time that is newer than the specified timestamp. It will
+    return a line seperated list of those changed files.
+
+    The view might also return with an empty response and status 204 (No
+    Content) if the source code that the development server runs was modified.
+    This is needed to free the current thread and allow django's runserver
+    command to reload the source code, to take those changes into account.
+    '''
     def get_resources(names, resource_class):
         resources = []
         for name in names:
