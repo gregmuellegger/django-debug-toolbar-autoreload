@@ -1,6 +1,7 @@
 import os
 import posixpath
 import sys
+import time
 from django.conf import settings
 from django.contrib.staticfiles import finders
 
@@ -8,38 +9,12 @@ from django.contrib.staticfiles import finders
 _win = (sys.platform == "win32")
 
 
-def get_mtimes(filenames):
-    global _win
-    _mtimes = {}
-    for filename in filenames:
-        if not os.path.exists(filename):
-            continue
-        stat = os.stat(filename)
-        mtime = stat.st_mtime
-        if _win:
-            mtime -= stat.st_ctime
-        if filename not in _mtimes:
-            _mtimes[filename] = mtime
-    return _mtimes
-
-
-def get_source_files():
-    def module_to_filename(module):
-        filename = getattr(module, '__file__', None)
-        if filename is None:
-            return filename
-        if filename.endswith(".pyc") or filename.endswith(".pyo"):
-            filename = filename[:-1]
-        if filename.endswith("$py.class"):
-            filename = filename[:-9] + ".py"
-        if not os.path.exists(filename):
-            return None
-        return filename
-
-    return [
-        filename
-        for filename in map(module_to_filename, sys.modules.values())
-        if filename]
+def get_mtime(filename):
+    stat = os.stat(filename)
+    mtime = stat.st_mtime
+    if _win:
+        mtime -= stat.st_ctime
+    return mtime
 
 
 def resolve_media_url(url):
@@ -56,40 +31,91 @@ def resolve_media_url(url):
 
 
 class FileWatcher(object):
-    def __init__(self, paths=None):
-        self._paths = paths
-        self.initial_mtimes = get_mtimes(self.get_paths())
-        self.current_mtimes = self.initial_mtimes.copy()
+    def __init__(self, resources):
+        self._resources = resources
 
-    def get_paths(self):
-        return [
-            filename
-            for filename in self._paths
-            if os.path.exists(filename)]
+    @property
+    def resources(self):
+        return self._resources
 
     def get_updated_files(self):
-        paths = self.get_paths()
-        self.current_mtimes = get_mtimes(paths)
         modified = []
-        for path in paths:
-            # file was deleted
-            if path in self.initial_mtimes and path not in self.current_mtimes:
-                pass
-            # file was created
-            elif path not in self.initial_mtimes and path in self.current_mtimes:
-                modified.append(path)
-            # file was modified
-            elif self.current_mtimes[path] != self.initial_mtimes[path]:
-                modified.append(path)
+        for resource in self.resources:
+            if resource.modified():
+                modified.append(resource)
         return modified
 
     def has_updates(self):
-        return len(self.get_updated_files()) > 0
+        for resource in self.resources:
+            if resource.modified():
+                return True
+        return False
 
 
 class SourceWatcher(FileWatcher):
     def __init__(self):
-        super(SourceWatcher, self).__init__()
+        self._timestamp = time.time()
 
-    def get_paths(self):
-        return get_source_files()
+    def _module_to_filename(self, module):
+        filename = getattr(module, '__file__', None)
+        if filename is None:
+            return filename
+        if filename.endswith(".pyc") or filename.endswith(".pyo"):
+            filename = filename[:-1]
+        if filename.endswith("$py.class"):
+            filename = filename[:-9] + ".py"
+        if not os.path.exists(filename):
+            return None
+        return filename
+
+    def get_source_files(self):
+        return [
+            filename
+            for filename in map(
+                self._module_to_filename,
+                sys.modules.values())
+            if filename]
+
+    @property
+    def resources(self):
+        sources = self.get_source_files()
+        sources = [Resource(src, self._timestamp) for src in sources]
+        return sources
+
+
+class Resource(object):
+    def __init__(self, name, timestamp=None):
+        self.name = name
+        self.timestamp = timestamp or time.time()
+        self._exists = self.exists()
+
+    @property
+    def path(self):
+        return self.name
+
+    def exists(self):
+        return os.path.exists(self.path)
+
+    def modified(self):
+        # delete was created or deleted
+        if self._exists != self.exists():
+            return True
+        mtime = get_mtime(self.path)
+        if mtime > self.timestamp:
+            return True
+        return False
+
+    @property
+    def mtime(self):
+        if self.exists():
+            return get_mtime(self.path)
+
+    def __unicode__(self):
+        return self.name
+    __str__ = __unicode__
+
+
+class MediaResource(Resource):
+    @property
+    def path(self):
+        return resolve_media_url(self.name)

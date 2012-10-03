@@ -1,6 +1,7 @@
 {% load i18n %}
 <script type="text/javascript">//<![CDATA[
 (function ($) {
+    var initial_timestamp = new Date().getTime() / 1000;
     var template_resources = [{% for template in templates %}
         "{{ template|escapejs }}"{% if not forloop.last %},{% endif %}
     {% endfor %}];
@@ -59,8 +60,12 @@
         var resources = findResources();
         var data = [];
         $.each(resources, function (i, resource) {
+            var timestamp = initial_timestamp;
             var query_type = (resource.type == 'template' ? 'template' : 'media');
-            data.push(query_type + '=' + encodeURIComponent(resource.src));
+            data.push(
+                query_type + '=' + 
+                encodeURIComponent(resource.src) + ':' +
+                timestamp);
         });
         data = data.join('&');
         $.ajax({
