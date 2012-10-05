@@ -9,7 +9,8 @@
             "{{ template|escapejs }}"{% if not forloop.last %},{% endif %}
         {% endfor %}];
 
-    var Config = function () {
+    var Config = function (opts) {
+        $.extend(this, opts);
         this.global_checkbox = $('#djDebugAutoreload-enabled');
         this.template = $('#djDebugAutoreload-template-enabled');
         this.css = $('#djDebugAutoreload-css-enabled');
@@ -20,6 +21,15 @@
             '#djDebugAutoreload-template-enabled, ' +
             '#djDebugAutoreload-css-enabled, ' +
             '#djDebugAutoreload-js-enabled').bind('click change', function () { that.update() });
+        var match = document.cookie.match(/djdt-autoreload=([^;]+);/);
+        if (match) {
+            var types = match[1].split(',');
+            this.global_checkbox.attr('checked', $.inArray('global', types) !== -1);
+            this.template.attr('checked', $.inArray('template', types) !== -1);
+            this.css.attr('checked', $.inArray('css', types) !== -1);
+            this.js.attr('checked', $.inArray('js', types) !== -1);
+        }
+        this.update();
     };
     Config.prototype.enable = function (type, enable) {
         if (type === undefined) { type = '__all__'; }
@@ -65,7 +75,14 @@
             '#djDebugAutoreload-css-enabled, ' +
             '#djDebugAutoreload-js-enabled').attr('disabled', !this.global_checkbox.attr('checked'));
         resources.findAll();
-        showMonitoringList(resources);
+        showMonitoringList(this, resources);
+
+        var cookie_config = [];
+        if (this.global_checkbox.attr('checked')) { cookie_config.push('global'); }
+        if (this.template.attr('checked')) { cookie_config.push('template'); }
+        if (this.css.attr('checked')) { cookie_config.push('css'); }
+        if (this.js.attr('checked')) { cookie_config.push('js'); }
+        document.cookie = 'djdt-autoreload=' + cookie_config.join(',');
     };
 
     var Resource = function (obj) {
@@ -147,7 +164,7 @@
         });
     };
 
-    var showMonitoringList = function (resources) {
+    var showMonitoringList = function (config, resources) {
         var table = $('#djDebugAutoreloadPanel .djDebugAutoreload-monitor table tbody');
         table.empty();
         $.each(resources, function (i, resource) {
@@ -210,12 +227,12 @@
             }
         });
 
-        showMonitoringList(resources);
+        showMonitoringList(config, resources);
     };
 
     $(document).ready(function () {
-        config = new Config();
         resources = new ResourceCollection();
+        config = new Config({resources: resources});
         listenForChanges();
         $('.djDebugAutoreload-reload').click(reload);
     });
