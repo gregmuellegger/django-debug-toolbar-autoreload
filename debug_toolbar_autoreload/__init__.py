@@ -1,6 +1,7 @@
 from django.test.signals import template_rendered
 from django.utils.translation import ugettext_lazy as _
 from debug_toolbar.panels import DebugPanel
+from . import conf
 from . import urls
 
 
@@ -53,4 +54,6 @@ class AutoreloadPanel(DebugPanel):
         self.record_stats({
             'templates': self.templates,
             'AUTORELOAD_URL': urls.AUTORELOAD_URL,
+            'AUTORELOAD_ENABLED': conf.AUTORELOAD_ENABLED,
+            'AUTORELOAD_FILETYPES': conf.AUTORELOAD_FILETYPES,
         })

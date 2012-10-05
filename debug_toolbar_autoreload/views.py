@@ -1,5 +1,6 @@
 import time
 from django.http import HttpResponse
+from django.utils import simplejson
 from .filesystem import FileWatcher, SourceWatcher
 from .filesystem import Resource, MediaResource
 
@@ -54,8 +55,8 @@ def notify(request):
             response.status_code = 204
             return response
         updates = file_watcher.get_updated_files()
-    response = HttpResponse('\n'.join(
-        '%s:%s' % (resource.name, resource.mtime)
+    response = HttpResponse(simplejson.dumps([
+        {'src': resource.name, 'mtime': resource.mtime}
         for resource in updates
-    ))
+    ]))
     return response
