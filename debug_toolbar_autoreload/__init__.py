@@ -23,7 +23,9 @@ class AutoreloadPanel(DebugPanel):
         return _('Autoreload')
 
     def nav_subtitle(self):
-        return u'active'
+        if conf.AUTORELOAD_ENABLED:
+            return _(u'enabled')
+        return _(u'disabled')
 
     def url(self):
         return ''

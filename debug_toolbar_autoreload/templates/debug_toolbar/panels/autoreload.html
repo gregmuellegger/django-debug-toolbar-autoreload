@@ -83,6 +83,9 @@
         if (this.css.attr('checked')) { cookie_config.push('css'); }
         if (this.js.attr('checked')) { cookie_config.push('js'); }
         document.cookie = 'djdt-autoreload=' + cookie_config.join(',');
+
+        var nav_subtitle = (this.global_checkbox.attr('checked') ? 'enabled' : 'disabled');
+        $('.djDebugPanelButton .djDebugAutoreloadPanel small').text(nav_subtitle);
     };
 
     var Resource = function (obj) {
