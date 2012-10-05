@@ -94,12 +94,17 @@ class Resource(object):
         return self.name
 
     def exists(self):
+        if not self.path:
+            return False
         return os.path.exists(self.path)
 
     def modified(self):
         # delete was created or deleted
-        if self._exists != self.exists():
+        exists = self.exists()
+        if self._exists != exists:
             return True
+        elif not exists:
+            return False
         mtime = get_mtime(self.path)
         if mtime > self.timestamp:
             return True
