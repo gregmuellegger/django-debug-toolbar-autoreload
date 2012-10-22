@@ -109,8 +109,14 @@
     Resource.prototype.reload = function () {
         /* we don't need to reload the whole page if a css file changed */
         if (this.type === 'css') {
-            var newElement = $(this.element).clone();
-            $(this.element).replaceWith(newElement);
+            var timestamp = new Date().getTime(),
+                href = $(this.element).attr('href');
+            href = href.replace(/([&?]__djdtAutoreload=)(\d+)(&|$)/, '$1' + timestamp + '$3');
+            if (href.match(/__djdtAutoreload=\d+/) === null) {
+                href += (href.match(/\?/) ? '&': '?') + '__djdtAutoreload=' + timestamp;
+            }
+            $(this.element).attr('href', href);
+            this.src = href;
         } else {
             reload();
         }

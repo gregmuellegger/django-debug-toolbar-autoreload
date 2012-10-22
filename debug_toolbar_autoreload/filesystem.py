@@ -121,6 +121,12 @@ class Resource(object):
 
 
 class MediaResource(Resource):
+    def __init__(self, *args, **kwargs):
+        super(MediaResource, self).__init__(*args, **kwargs)
+
     @property
     def path(self):
-        return resolve_media_url(self.name)
+        name = self.name
+        if '?' in name:
+            name, query = self.name.split('?', 1)
+        return resolve_media_url(name)
