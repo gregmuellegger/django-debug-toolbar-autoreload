@@ -1,8 +1,35 @@
+import os
 import time
 from django.http import HttpResponse
 from django.utils import simplejson
+from . import conf
 from .filesystem import FileWatcher, SourceWatcher
 from .filesystem import Resource, MediaResource
+
+
+class Suspender(object):
+    timeout = conf.AUTORELOAD_TIMEOUT
+
+    def __init__(self):
+        self.parent_process_id = os.getppid()
+        self.source_watcher = SourceWatcher()
+        self.start_time = time.time()
+
+    def should_suspend(self):
+        # return after a set amount of time in case the other checks fail.
+        if time.time() - self.start_time > self.timeout:
+            return True
+        # if the parent process id changed (most likely to 1) means that the
+        # process got daemonized. In case of django, this means that the
+        # development server wants to shutdown.
+        if self.parent_process_id != os.getppid():
+            return True
+        # We need to suspend if the source code has changed. Otherwise
+        # django's autoreloader won't be able to reload the server until all
+        # requests are finished.
+        if self.source_watcher.has_updates():
+            return True
+        return False
 
 
 def notify(request):
@@ -43,14 +70,15 @@ def notify(request):
     resources += get_resources(request.REQUEST.getlist('media'), MediaResource)
 
     file_watcher = FileWatcher(resources)
-    source_watcher = SourceWatcher()
+    suspender = Suspender()
     updates = None
     while not updates:
         time.sleep(0.5)
         # break the watching action and return a response to release the
         # running thread. This is necessary since the looped check would
-        # prevent django from loading changed source code.
-        if source_watcher.has_updates():
+        # prevent django from loading changed source code or quitting the
+        # development server with CTRL-C
+        if suspender.should_suspend():
             response = HttpResponse()
             response.status_code = 204
             return response
