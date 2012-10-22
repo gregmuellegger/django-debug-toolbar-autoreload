@@ -1,6 +1,9 @@
 {% load i18n %}
 <script type="text/javascript">//<![CDATA[
 (function ($) {
+    var RETRY = 500,
+        ERROR_RETRY = 3000;
+
     var config,
         resources,
         watch_request,
@@ -216,18 +219,22 @@
                                 resource.reload();
                             }
                         });
+                        setTimeout(listenForChanges, RETRY);
                         break;
                     case 0:
+                        setTimeout(listenForChanges, ERROR_RETRY);
+                        break;
                     case 204:
+                        setTimeout(listenForChanges, RETRY);
                         break;
                     default:
                         console.error('Debugtoolbar, Autoreload: unhandled status code by notify view', jqXHR.status);
+                        setTimeout(listenForChanges, ERROR_RETRY);
                         break;
                 }
-                setTimeout(listenForChanges, 500);
             },
             error: function () {
-                setTimeout(listenForChanges, 3000);
+                setTimeout(listenForChanges, ERROR_RETRY);
             }
         });
 
