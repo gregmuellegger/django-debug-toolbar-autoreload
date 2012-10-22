@@ -107,7 +107,13 @@
         $.extend(this, obj);
     };
     Resource.prototype.reload = function () {
-        reload();
+        /* we don't need to reload the whole page if a css file changed */
+        if (this.type === 'css') {
+            var newElement = $(this.element).clone();
+            $(this.element).replaceWith(newElement);
+        } else {
+            reload();
+        }
     };
 
     var ResourceCollection = function () {};
@@ -154,7 +160,8 @@
             if (!url.match(/^data:/)) {
                 that.push({
                     type: 'css',
-                    src: $(this).attr('href')
+                    src: $(this).attr('href'),
+                    element: this
                 });
             }
         });
@@ -164,7 +171,8 @@
             if (!url.match(/^data:/)) {
                 that.push({
                     type: 'js',
-                    src: $(this).attr('src')
+                    src: $(this).attr('src'),
+                    element: this
                 });
             }
         });
