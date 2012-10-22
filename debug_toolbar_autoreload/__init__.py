@@ -1,4 +1,4 @@
 from .panels import AutoreloadPanel
 
 
-__version__ = '0.1.0'.split('.')
+__version__ = '0.1.1'.split('.')

@@ -19,6 +19,12 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
+long_description = '\n\n'.join((
+    read('README.rst'),
+    read('CHANGES.rst'),
+))
+
+
 setup(
     name='django-debug-toolbar-autoreload',
     version=find_version('debug_toolbar_autoreload', '__init__.py'),
@@ -29,7 +35,7 @@ setup(
     url='https://github.com/gregmuellegger/django-debug-toolbar-autoreload',
     license='BSD licence, see LICENSE file',
     description='Automatically reloads your browser when a template, css or javascript file was modified.',
-    long_description=read('README.rst'),
+    long_description=long_description,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
