@@ -17,8 +17,9 @@ class Suspender(object):
 
     def should_suspend(self):
         # return after a set amount of time in case the other checks fail.
-        if time.time() - self.start_time > self.timeout:
-            return True
+        if self.timeout:
+            if time.time() - self.start_time > self.timeout:
+                return True
         # if the parent process id changed (most likely to 1) means that the
         # process got daemonized. In case of django, this means that the
         # development server wants to shutdown.
