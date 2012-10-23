@@ -1,6 +1,13 @@
 Changelog
 =========
 
+0.2.0
+-----
+
+* Don't reload the whole page if only a css file was changed. Instead load CSS
+  in place.
+* Adding CHANGES.rst to MANIFEST.in which caused errors during install.
+
 0.1.1
 -----
 
