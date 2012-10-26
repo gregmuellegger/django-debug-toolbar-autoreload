@@ -7,6 +7,8 @@ The purpose is to automatically reload the page if a template that was used to
 render the current page is changed. It is for your browser what the
 ``runserver``'s auto-reload feature is for your python code.
 
+Watch this screencast for a short introduction: http://www.youtube.com/watch?v=zQSoJF70if4
+
 .. _django-debug-toolbar: http://pypi.python.org/pypi/django-debug-toolbar
 
 Install
