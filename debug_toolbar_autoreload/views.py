@@ -1,10 +1,14 @@
 import os
 import time
 from django.http import HttpResponse
-from django.utils import simplejson
 from . import conf
 from .filesystem import FileWatcher, SourceWatcher
 from .filesystem import Resource, MediaResource
+
+try:
+    import json
+except ImportError: # python < 2.6
+    from django.utils import simplejson as json
 
 
 class Suspender(object):
@@ -84,7 +88,7 @@ def notify(request):
             response.status_code = 204
             return response
         updates = file_watcher.get_updated_files()
-    response = HttpResponse(simplejson.dumps([
+    response = HttpResponse(json.dumps([
         {'src': resource.name, 'mtime': resource.mtime}
         for resource in updates
     ]))
