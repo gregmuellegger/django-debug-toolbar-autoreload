@@ -1,6 +1,37 @@
 django-debug-toolbar-autoreload
 ===============================
 
+    **THIS MODULE IS NO LONGER MAINTAINED**
+
+    I decided to stop the development on this project since there are now more
+    mature solutions to the same problem. I personally prefer to use gulp_ to
+    observe files for changes and to start a livereload server that can be used
+    with your browser's livereload plugin.
+
+    .. _gulp: http://gulpjs.com/
+
+    Here is an example ``gulpfile.js`` that does nearly the same as the
+    autoreload feature of this package::
+
+        var gulp = require('gulp'),
+            livereload = require('gulp-livereload'),
+            watch = require('gulp-watch');
+
+        var watchPaths = [
+            'templates/**.html',
+            'static/**.js',
+            'static/**.css',
+        ];
+
+        gulp.task('watch', function() {
+            gulp.src(watchPaths)
+                .pipe(watch())
+                .pipe(livereload());
+        });
+
+    If you still have interest in this project and want to maintain it, just
+    drop me a message and we can discuss the details.
+
 This package contains an extra panel for the excellent django-debug-toolbar_.
 
 The purpose is to automatically reload the page if a template that was used to
